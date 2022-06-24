@@ -18,16 +18,18 @@
           </router-link>
         </v-col>
         <v-col>
-          <v-btn rounded x-large width="400" height="70" color="#98FB98">
-            <v-img
-              height="60px"
-              width="60px"
-              src="../assets/category.svg"
-            ></v-img>
-            <v-list-item-subtitle style="color: #228b22"
-              >Search by category</v-list-item-subtitle
-            >
-          </v-btn>
+          <router-link :to="'/fish/FishCategory/'">
+            <v-btn rounded x-large width="400" height="70" color="#98FB98">
+              <v-img
+                height="60px"
+                width="60px"
+                src="../assets/category.svg"
+              ></v-img>
+              <v-list-item-subtitle style="color: #228b22"
+                >Search by category</v-list-item-subtitle
+              >
+            </v-btn>
+          </router-link>
         </v-col>
         <v-col>
           <router-link :to="'/fish/FishDetails/' + rand">
