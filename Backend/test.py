@@ -1,6 +1,7 @@
 from flask import Flask, request, make_response, jsonify, render_template, url_for, redirect
 from pony import orm
 from flask_cors import CORS
+from pony.orm import *
 
 DB = orm.Database()
 
@@ -18,6 +19,12 @@ class Profil(DB.Entity):
     ime = orm.Required(str)
     prezime = orm.Required(str)
     korisnickoIme = orm.Required(str)
+
+
+class Ribe(DB.Entity):
+    vrsta = orm.Required(str)
+    voda = orm.Required(str)
+    lokacija = orm.Required(StrArray)
 
 
 DB.bind(provider="sqlite", filename="database.sqlite", create_db=True)
@@ -50,6 +57,19 @@ def get_profil():
         return {"response": "Fail", "error": str(e)}
 
 
+def get_ribe():
+    try:
+        with orm.db_session:
+            db_querry = orm.select(x for x in Ribe)[:]
+            results_list = []
+            for r in db_querry:
+                results_list.append(r.to_dict())
+            response = {"response": "Success", "data": results_list}
+            return response
+    except Exception as e:
+        return {"response": "Fail", "error": str(e)}
+
+
 def add_stvar(json_request):
     try:
         stvar = json_request["stvar"]
@@ -73,6 +93,19 @@ def add_profil(json_request):
         korisnickoIme = json_request["korisnickoIme"]
         with orm.db_session:
             Profil(ime=ime, prezime=prezime, korisnickoIme=korisnickoIme)
+            response = {"response": "Success"}
+            return response
+    except Exception as e:
+        return {"response": "Fail", "error": str(e)}
+
+
+def add_ribe(json_request):
+    try:
+        vrsta = json_request["vrsta"]
+        voda = json_request["voda"]
+        lokacija = json_request["lokacija"]
+        with orm.db_session:
+            Ribe(vrsta=vrsta, voda=voda, lokacija=lokacija)
             response = {"response": "Success"}
             return response
     except Exception as e:
@@ -113,6 +146,15 @@ def vrati_profil():
         return make_response(jsonify(response), 400)
 
 
+@app.route("/ribe/vrati", methods=["GET"])
+def vrati_ribe():
+    response = get_ribe()
+    if response["response"] == "Success":
+        return make_response(jsonify(response), 200)
+    else:
+        return make_response(jsonify(response), 400)
+
+
 @app.route("/stvar/dodaj", methods=["POST", "GET"])
 def dodaj_stvar():
     if request.method == "POST":
@@ -142,7 +184,7 @@ def dodaj_profil():
     if request.method == "POST":
         try:
             json_request = {}
-            for key, value in request.form.items():
+            for key, value in request.json.items():
                 if value == "":
                     json_request[key] = None
                 else:
@@ -152,6 +194,30 @@ def dodaj_profil():
             return make_response(jsonify(response), 400)
 
         response = add_profil(json_request)
+
+        if response["response"] == "Success":
+            return make_response(jsonify(response), 200)
+        else:
+            return make_response(jsonify(response), 400)
+    else:
+        return make_response(jsonify(response), 200)
+
+
+@app.route("/ribe/dodaj", methods=["POST", "GET"])
+def dodaj_ribe():
+    if request.method == "POST":
+        try:
+            json_request = {}
+            for key, value in request.form.items():
+                if value == "":
+                    json_request[key] = None
+                else:
+                    json_request[key] = value
+        except Exception as e:
+            response = {"response": str(e)}
+            return make_response(jsonify(response), 400)
+
+        response = add_ribe(json_request)
 
         if response["response"] == "Success":
             return make_response(jsonify(response), 200)

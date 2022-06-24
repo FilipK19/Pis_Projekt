@@ -30,8 +30,8 @@
             >
           </v-btn>
           <v-col> </v-col>
-          <p>Random Number = {{ randomNumber }}</p>
-          <v-btn flat color="#98FB98" @click="myFunction()">Randomize</v-btn>
+          <p>Random Number = {{ ranFish }}</p>
+          <v-btn flat color="#98FB98" @click="randomNum()">Randomize</v-btn>
         </v-col>
         <v-col>
           <router-link :to="'/fish/FishDetails/' + rand">
@@ -68,6 +68,7 @@ export default {
     return {
       input: "",
       randomNumber: "",
+      ranFish: "",
       rand: "",
     };
   },
@@ -78,6 +79,10 @@ export default {
     myFunction: function () {
       this.randomNumber = Math.random() * 10;
     },
+    randomNum: function () {
+      this.ranFish = Math.floor(Math.random() * (21 - 1 + 1) + 1);
+    },
+
     randomFish() {
       if (this.randomNumber < 1) {
         this.rand = "Pastrva";
