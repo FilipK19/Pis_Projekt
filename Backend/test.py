@@ -27,6 +27,12 @@ class Ribe(DB.Entity):
     lokacija = orm.Required(StrArray)
 
 
+class UlovljeneRibe(DB.Entity):
+    vrsta = orm.Required(str)
+    voda = orm.Required(str)
+    lokacija = orm.Required(str)
+
+
 DB.bind(provider="sqlite", filename="database.sqlite", create_db=True)
 DB.generate_mapping(create_tables=True)
 
@@ -61,6 +67,19 @@ def get_ribe():
     try:
         with orm.db_session:
             db_querry = orm.select(x for x in Ribe)[:]
+            results_list = []
+            for r in db_querry:
+                results_list.append(r.to_dict())
+            response = {"response": "Success", "data": results_list}
+            return response
+    except Exception as e:
+        return {"response": "Fail", "error": str(e)}
+
+
+def get_upecane_ribe():
+    try:
+        with orm.db_session:
+            db_querry = orm.select(x for x in UlovljeneRibe)[:]
             results_list = []
             for r in db_querry:
                 results_list.append(r.to_dict())
@@ -112,6 +131,19 @@ def add_ribe(json_request):
         return {"response": "Fail", "error": str(e)}
 
 
+def add_upecane_ribe(json_request):
+    try:
+        vrsta = json_request["vrsta"]
+        voda = json_request["voda"]
+        lokacija = json_request["lokacija"]
+        with orm.db_session:
+            UlovljeneRibe(vrsta=vrsta, voda=voda, lokacija=lokacija)
+            response = {"response": "Success"}
+            return response
+    except Exception as e:
+        return {"response": "Fail", "error": str(e)}
+
+
 @app.route("/")
 def home():
     response = [{
@@ -149,6 +181,15 @@ def vrati_profil():
 @app.route("/ribe/vrati", methods=["GET"])
 def vrati_ribe():
     response = get_ribe()
+    if response["response"] == "Success":
+        return make_response(jsonify(response), 200)
+    else:
+        return make_response(jsonify(response), 400)
+
+
+@app.route("/upecaneribe/vrati", methods=["GET"])
+def vrati_upecane_ribe():
+    response = get_upecane_ribe()
     if response["response"] == "Success":
         return make_response(jsonify(response), 200)
     else:
@@ -218,6 +259,30 @@ def dodaj_ribe():
             return make_response(jsonify(response), 400)
 
         response = add_ribe(json_request)
+
+        if response["response"] == "Success":
+            return make_response(jsonify(response), 200)
+        else:
+            return make_response(jsonify(response), 400)
+    else:
+        return make_response(jsonify(response), 200)
+
+
+@app.route("/upecaneribe/dodaj", methods=["POST", "GET"])
+def dodaj_upecane_ribe():
+    if request.method == "POST":
+        try:
+            json_request = {}
+            for key, value in request.json.items():
+                if value == "":
+                    json_request[key] = None
+                else:
+                    json_request[key] = value
+        except Exception as e:
+            response = {"response": str(e)}
+            return make_response(jsonify(response), 400)
+
+        response = add_upecane_ribe(json_request)
 
         if response["response"] == "Success":
             return make_response(jsonify(response), 200)

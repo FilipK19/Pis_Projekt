@@ -47,8 +47,18 @@ const routes = [
   },
   {
     path: '/fish/fishcategory',
-    name: 'Test',
+    name: 'Category',
     component: () => import(/* webpackChunkName: "about" */ '../views/FishCategory.vue'),
+  },
+  {
+    path: '/profile/upload',
+    name: 'Upload',
+    component: () => import(/* webpackChunkName: "about" */ '../views/ProfileUpload.vue'),
+  },
+  {
+    path: '/profile/statistics',
+    name: 'Statistics',
+    component: () => import(/* webpackChunkName: "about" */ '../views/FishesCaught.vue'),
   },
 ]
 
