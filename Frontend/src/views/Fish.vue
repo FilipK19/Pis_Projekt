@@ -1,10 +1,11 @@
 <template>
   <div class="about">
     <v-container class="grey lighten-5">
-      <v-row no-gutters>
+      <v-col no-gutters>
         <v-col>
+          <v-text-field label="Enter fish name" v-model="input"> </v-text-field>
           <router-link :to="'/fish/FishDetails/' + input">
-            <v-btn rounded x-large width="900" height="100" color="#98FB98">
+            <v-btn rounded x-large width="400" height="70" color="#98FB98">
               <v-img
                 height="60px"
                 width="60px"
@@ -15,11 +16,9 @@
               >
             </v-btn>
           </router-link>
-          <v-text-field label="Enter fish" v-model="input"> </v-text-field>
-          <v-col> </v-col>
         </v-col>
         <v-col>
-          <v-btn rounded x-large width="900" height="100" color="#98FB98">
+          <v-btn rounded x-large width="400" height="70" color="#98FB98">
             <v-img
               height="60px"
               width="60px"
@@ -29,18 +28,15 @@
               >Search by category</v-list-item-subtitle
             >
           </v-btn>
-          <v-col> </v-col>
-          <p>Random Number = {{ randomNumber }}</p>
-          <v-btn flat color="#98FB98" @click="randomNum()">Randomize</v-btn>
         </v-col>
         <v-col>
           <router-link :to="'/fish/FishDetails/' + rand">
             <v-btn
-              @click="randomFish()"
+              @click="randomNum(), randomFish()"
               rounded
               x-large
-              width="900"
-              height="100"
+              width="400"
+              height="70"
               color="#98FB98"
             >
               <v-img
@@ -54,7 +50,7 @@
             </v-btn>
           </router-link>
         </v-col>
-      </v-row>
+      </v-col>
     </v-container>
   </div>
 </template>
@@ -69,7 +65,7 @@ export default {
       input: "",
       randomNumber: "",
       ranFish: "",
-      rand: "",
+      rand: "Pastrva",
     };
   },
   methods: {
