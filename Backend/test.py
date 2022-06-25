@@ -1,3 +1,4 @@
+from enum import unique
 from flask import Flask, request, make_response, jsonify, render_template, url_for, redirect
 from pony import orm
 from flask_cors import CORS
@@ -31,6 +32,12 @@ class UlovljeneRibe(DB.Entity):
     vrsta = orm.Required(str)
     voda = orm.Required(str)
     lokacija = orm.Required(str)
+
+
+class Trgovina(DB.Entity):
+    vrsta = orm.Required(str)
+    stvar = orm.Required(str)
+    cijena = orm.Required(float)
 
 
 DB.bind(provider="sqlite", filename="database.sqlite", create_db=True)
@@ -89,6 +96,19 @@ def get_upecane_ribe():
         return {"response": "Fail", "error": str(e)}
 
 
+def get_shop_items():
+    try:
+        with orm.db_session:
+            db_querry = orm.select(x for x in Trgovina)[:]
+            results_list = []
+            for r in db_querry:
+                results_list.append(r.to_dict())
+            response = {"response": "Success", "data": results_list}
+            return response
+    except Exception as e:
+        return {"response": "Fail", "error": str(e)}
+
+
 def add_stvar(json_request):
     try:
         stvar = json_request["stvar"]
@@ -99,19 +119,6 @@ def add_stvar(json_request):
             cijena = None
         with orm.db_session:
             Stvar(stvar=stvar, namjena=namjena, cijena=cijena)
-            response = {"response": "Success"}
-            return response
-    except Exception as e:
-        return {"response": "Fail", "error": str(e)}
-
-
-def add_profil(json_request):
-    try:
-        ime = json_request["ime"]
-        prezime = json_request["prezime"]
-        korisnickoIme = json_request["korisnickoIme"]
-        with orm.db_session:
-            Profil(ime=ime, prezime=prezime, korisnickoIme=korisnickoIme)
             response = {"response": "Success"}
             return response
     except Exception as e:
@@ -144,19 +151,17 @@ def add_upecane_ribe(json_request):
         return {"response": "Fail", "error": str(e)}
 
 
-@app.route("/")
-def home():
-    response = [{
-        "id": 1234,
-        "proizvod": "jabuka",
-        "cijena": 5,
-        "dostava": {
-            "kupac": "John Smith",
-            "adresa": "Rovinjska 14",
-            "grad": "Pula"
-        }
-    }]
-    return make_response(jsonify(response), 200)
+def add_trgovina(json_request):
+    try:
+        stvar = json_request["stvar"]
+        vrsta = json_request["vrsta"]
+        cijena = json_request["cijena"]
+        with orm.db_session:
+            Trgovina(stvar=stvar, vrsta=vrsta, cijena=cijena)
+            response = {"response": "Success"}
+            return response
+    except Exception as e:
+        return {"response": "Fail", "error": str(e)}
 
 
 @app.route("/stvar/vrati", methods=["GET"])
@@ -196,6 +201,15 @@ def vrati_upecane_ribe():
         return make_response(jsonify(response), 400)
 
 
+@app.route("/trgovina/vrati", methods=["GET"])
+def vrati_trgovinu():
+    response = get_shop_items()
+    if response["response"] == "Success":
+        return make_response(jsonify(response), 200)
+    else:
+        return make_response(jsonify(response), 400)
+
+
 @app.route("/stvar/dodaj", methods=["POST", "GET"])
 def dodaj_stvar():
     if request.method == "POST":
@@ -211,30 +225,6 @@ def dodaj_stvar():
             return make_response(jsonify(response), 400)
 
         response = add_stvar(json_request)
-
-        if response["response"] == "Success":
-            return make_response(jsonify(response), 200)
-        else:
-            return make_response(jsonify(response), 400)
-    else:
-        return make_response(jsonify(response), 200)
-
-
-@app.route("/profil/dodaj", methods=["POST", "GET"])
-def dodaj_profil():
-    if request.method == "POST":
-        try:
-            json_request = {}
-            for key, value in request.json.items():
-                if value == "":
-                    json_request[key] = None
-                else:
-                    json_request[key] = value
-        except Exception as e:
-            response = {"response": str(e)}
-            return make_response(jsonify(response), 400)
-
-        response = add_profil(json_request)
 
         if response["response"] == "Success":
             return make_response(jsonify(response), 200)
@@ -283,6 +273,30 @@ def dodaj_upecane_ribe():
             return make_response(jsonify(response), 400)
 
         response = add_upecane_ribe(json_request)
+
+        if response["response"] == "Success":
+            return make_response(jsonify(response), 200)
+        else:
+            return make_response(jsonify(response), 400)
+    else:
+        return make_response(jsonify(response), 200)
+
+
+@app.route("/trgovina/dodaj", methods=["POST", "GET"])
+def dodaj_trgovinu():
+    if request.method == "POST":
+        try:
+            json_request = {}
+            for key, value in request.form.items():
+                if value == "":
+                    json_request[key] = None
+                else:
+                    json_request[key] = value
+        except Exception as e:
+            response = {"response": str(e)}
+            return make_response(jsonify(response), 400)
+
+        response = add_trgovina(json_request)
 
         if response["response"] == "Success":
             return make_response(jsonify(response), 200)
