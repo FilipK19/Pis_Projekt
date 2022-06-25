@@ -66,20 +66,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/Shop Vues/FishingRod.vue'),
   },
   {
-    path: '/shop/baits',
-    name: 'FishingBaits',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Shop Vues/Bait.vue'),
-  },
-  {
     path: '/shop/gear',
     name: 'FishingGear',
     component: () => import(/* webpackChunkName: "about" */ '../views/Shop Vues/Gear.vue'),
   },
-  {
-    path: '/shop/boats',
-    name: 'FishingBoats',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Shop Vues/Boat.vue'),
-  },
+  
 ]
 
 const router = new VueRouter({

@@ -287,7 +287,7 @@ def dodaj_trgovinu():
     if request.method == "POST":
         try:
             json_request = {}
-            for key, value in request.form.items():
+            for key, value in request.json.items():
                 if value == "":
                     json_request[key] = None
                 else:
